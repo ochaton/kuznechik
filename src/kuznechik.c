@@ -3,8 +3,9 @@
 #include <stdint.h>
 #include <string.h> // for memcpy
 
-
 #include <stdio.h>
+
+// for debug:
 static void xd(uint8_t *p, ssize_t size) {
 	for (uint8_t * c = p; c < p + size; c++) {
 		printf("0x%02X ", *c);
@@ -135,8 +136,6 @@ void GOST_Kuz_set_key(uint8_t master_key[32], round_keys_t *rk) {
 	for (size_t i = 0; i < sizeof(cs) / sizeof(cs[0]); i++) {
 		cs[i].b[15] = i + 1;
 		GOST_Kuz_L(&cs[i]);
-
-		// xd(cs[i].b, sizeof(cs[i]));
 	}
 
 	vect_t ks[2] = {};

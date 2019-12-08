@@ -181,6 +181,9 @@ args_t parse(int argc, char const *argv[]) {
 			fprintf(stderr, "Master key file is bigger than 32 bytes!\n");
 			exit(1);
 		}
+	} else {
+		fprintf(stderr, "Path to master key is required (-k option)\n");
+		usage(1);
 	}
 
 	if (args.ivf) {
@@ -222,13 +225,15 @@ int main(int argc, char const *argv[]) {
 			perror("input descriptor unexpectedly was closed");
 			exit(1);
 		}
-
 		if ((size_t) rd < sizeof(buffer)) { // we have to add padding
 			if (rd == 0) {
 				break; // no read. finish loop
 			}
 
 			if (rd % 16) { // if padding is needed
+				if (args.cmd == DECRYPT) {
+					fprintf(stderr, "Invalid padding for decode\n");
+				}
 				memset(buffer + rd, 0, BUF_SIZE - rd); // set other bytes of buffer to 0
 				rd += 16 - rd % 16;
 			}
