@@ -221,6 +221,8 @@ int main(int argc, char const *argv[]) {
 
 	for (;;) {
 		int rd = read(0, buffer, sizeof(buffer));
+		size_t orig_size = rd;
+
 		if (-1 == rd) {
 			perror("input descriptor unexpectedly was closed");
 			exit(1);
@@ -231,9 +233,6 @@ int main(int argc, char const *argv[]) {
 			}
 
 			if (rd % 16) { // if padding is needed
-				if (args.cmd == DECRYPT) {
-					fprintf(stderr, "Invalid padding for decode\n");
-				}
 				memset(buffer + rd, 0, BUF_SIZE - rd); // set other bytes of buffer to 0
 				rd += 16 - rd % 16;
 			}
@@ -246,7 +245,7 @@ int main(int argc, char const *argv[]) {
 			GOST_Kuz_X(&args.iv, (vect_t *) p, (vect_t *) cp);
 		}
 
-		int w = write(1, out, rd); // we have to write exactly read amount of bytes
+		int w = write(1, out, orig_size); // we have to write exactly read amount of bytes
 		if (-1 == w) {
 			perror("Unexpected error on write");
 			exit(1);
